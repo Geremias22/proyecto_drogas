@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="card-footer bg-transparent border-top-0">
-            <button class="btn btn-success w-100">Añadir al carrito</button>
+            <a href="index.php?c=cart&a=add&id=<?php echo $product['id']; ?>" class="btn btn-success w-100">Añadir al carrito</a>
         </div>
     </div>
 </div>
