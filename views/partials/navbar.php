@@ -24,7 +24,7 @@
           </li>
         <?php else: ?>
           <li class="nav-item">
-            <a class="nav-link" href="index.php?c=auth&a=index">Entrar</a>
+            <a class="nav-link" href="index.php?c=auth&a=index&mode=login">Login</a>
           </li>
         <?php endif; ?>
 

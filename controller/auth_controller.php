@@ -23,8 +23,10 @@ class AuthController {
     // --- MÉTODOS DE ACCIÓN ---
 
     public function index() {
+        $mode = $_GET['mode'] ?? 'login';
+
         ob_start();
-        require_once 'views/login.php';
+        require_once 'views/auth.php';
         $viewContent = ob_get_clean();
         require_once 'views/layouts/main.php';
     }
@@ -37,7 +39,19 @@ class AuthController {
             $userModel = new UserModel();
             $user = $userModel->getUserByEmail($email);
 
-            if ($user && $user['password'] === $pass) {
+            $valid = false;
+
+            if ($user) {
+                // Si está hasheado (password_hash suele empezar por $2y$ o $argon2...)
+                if (isset($user['password']) && str_starts_with($user['password'], '$')) {
+                    $valid = password_verify($pass, $user['password']);
+                } else {
+                    // Compatibilidad con contraseñas en claro (tu admin actual)
+                    $valid = ($user['password'] === $pass);
+                }
+            }
+
+            if ($valid) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_role'] = $user['role'];
@@ -57,4 +71,49 @@ class AuthController {
         session_destroy();
         header("Location: index.php?c=home&a=index&msg=Sesión cerrada correctamente");
     }
+
+    public function register() {
+    ob_start();
+        require_once 'views/register.php';
+        $viewContent = ob_get_clean();
+        require_once 'views/layouts/main.php';
+    }
+
+    public function registerPost() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php?c=auth&a=register");
+            exit();
+        }
+
+        $name  = trim($_POST['name'] ?? '');
+        $email = trim($_POST['gmail'] ?? '');
+        $pass  = $_POST['password'] ?? '';
+        $edad  = $_POST['edad'] ?? null;
+
+        if ($name === '' || $email === '' || $pass === '') {
+            header("Location: index.php?c=auth&a=register&error=Rellena los campos obligatorios");
+            exit();
+        }
+
+        $userModel = new UserModel();
+
+        // Necesitas añadir este método al UserModel
+        if ($userModel->emailExists($email)) {
+            header("Location: index.php?c=auth&a=register&error=Ese email ya está registrado");
+            exit();
+        }
+
+        $hash = password_hash($pass, PASSWORD_DEFAULT);
+
+        // Necesitas añadir este método al UserModel
+        $newId = $userModel->create($name, $email, $hash, $edad);
+
+        // Auto-login
+        $_SESSION['user_id'] = $newId;
+        $_SESSION['user_name'] = $name;
+        $_SESSION['user_role'] = 'customer';
+
+        header("Location: index.php?c=home&a=index&msg=Cuenta creada correctamente");
+    }
+
 }
