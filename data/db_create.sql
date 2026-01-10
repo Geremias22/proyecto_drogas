@@ -268,3 +268,11 @@ INSERT INTO pack_products (pack_id, product_id, qty) VALUES
 INSERT INTO users (name, role, gmail, password, edad, is_active) VALUES
 ('Admin', 'admin', 'admin@admin.com', 'admin', 30, 1);
 
+
+
+-- ALTER TABLE orders ADD payment_method VARCHAR(30) NULL AFTER status;
+
+-- ALTER TABLE packs
+--   ADD COLUMN final_price DECIMAL(10,2) NULL AFTER image,
+--   ADD COLUMN discount_percent DECIMAL(5,2) NULL AFTER final_price;
+
