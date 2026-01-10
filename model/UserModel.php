@@ -44,10 +44,13 @@ class UserModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getById($id) {
-        $sql = "SELECT id, name, role, gmail, edad, is_active FROM users WHERE id = :id";
+    public function getById(int $id) {
+        $sql = "SELECT id, name, gmail, role, edad, img, date_create, last_date, is_active
+                FROM users
+                WHERE id = :id
+                LIMIT 1";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => (int)$id]);
+        $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -64,5 +67,11 @@ class UserModel {
         $sql = "UPDATE users SET is_active = :active, last_date = NOW() WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['active' => (int)$active, 'id' => (int)$id]);
+    }
+
+    public function updatePasswordHash(int $id, string $hash): bool {
+        $sql = "UPDATE users SET password = :pwd, last_date = NOW() WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute(['pwd' => $hash, 'id' => $id]);
     }
 }

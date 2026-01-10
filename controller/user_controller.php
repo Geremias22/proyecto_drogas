@@ -1,6 +1,7 @@
 <?php
 require_once 'controller/auth_controller.php';
 require_once 'model/UserModel.php';
+require_once 'model/OrderModel.php';
 
 class UserController
 {
@@ -64,5 +65,21 @@ class UserController
             header("Location: index.php?c=user&a=index&error=No se pudo actualizar el estado");
         }
         exit();
+    }
+
+    public function profile()
+    {
+        AuthController::checkLogin();
+
+        $userModel = new UserModel();
+        $orderModel = new OrderModel();
+
+        $user = $userModel->getById((int)$_SESSION['user_id']);   // lo añadimos abajo
+        $orders = $orderModel->getOrdersByUser((int)$_SESSION['user_id']);
+
+        ob_start();
+        require 'views/user_profile.php';
+        $viewContent = ob_get_clean();
+        require 'views/layouts/main.php';
     }
 }

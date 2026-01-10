@@ -29,7 +29,7 @@
                     <form action="index.php?c=cart&a=add&id=<?php echo $product['id']; ?>" method="POST" class="d-flex align-items-center mb-4">
                         <div class="me-3">
                             <label class="form-label small fw-bold">Cantidad:</label>
-                            <input type="number" class="form-control" value="1" min="1" max="<?php echo $product['stock_qty']; ?>" style="width: 80px;">
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" max="<?php echo $product['stock_qty']; ?>" style="width: 80px;">
                         </div>
                         <div>
                             <p class="mb-0 small text-muted">
@@ -39,8 +39,9 @@
                 </div>
 
                 <div class="d-grid gap-2 d-md-flex">
-                    <button class="btn btn-success btn-lg px-5">
-                        <i class="bi bi-cart-plus"></i> Añadir al Carrito
+                    <?php $outOfStock = ((int)$product['stock_qty'] <= 0); ?>
+                    <button class="btn btn-success btn-lg px-5" <?php echo $outOfStock ? 'disabled' : ''; ?>>
+                        Añadir al Carrito
                     </button>
                     </form>
                     <a href="index.php?c=product_list" class="btn btn-outline-secondary btn-lg">Volver</a>

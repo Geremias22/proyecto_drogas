@@ -18,7 +18,7 @@ class OrderModel {
      * @throws Exception si falta stock o hay error SQL
      * @return string order_reference
      */
-    public function createFromCart(int $userId, string $phone, string $address, array $cart): string
+    public function createFromCart(int $userId, string $phone, string $address, string $paymentMethod, array $cart): string
     {
         if (empty($cart)) {
             throw new Exception("El carrito está vacío");
@@ -38,14 +38,16 @@ class OrderModel {
             $orderRef = $this->generateUniqueReference();
 
             // 1) Insert order
-            $sqlOrder = "INSERT INTO orders (user_id, order_reference, status, phone, address)
-                         VALUES (:user_id, :ref, 'pending', :phone, :address)";
+            $sqlOrder = "INSERT INTO orders (user_id, order_reference, status, payment_method, phone, address)
+            VALUES (:user_id, :ref, 'paid', :payment_method, :phone, :address)";
+            
             $stmtOrder = $this->db->prepare($sqlOrder);
             $this->execOrThrow($stmtOrder, [
                 'user_id' => $userId,
                 'ref'     => $orderRef,
                 'phone'   => $phone,
-                'address' => $address
+                'address' => $address,
+                'payment_method' => $paymentMethod,
             ], "No se pudo crear el pedido");
 
             $orderId = (int)$this->db->lastInsertId();
@@ -125,6 +127,59 @@ class OrderModel {
             throw $e;
         }
     }
+
+    public function getOrdersByUser(int $userId): array {
+        $sql = "SELECT id, order_reference, status, phone, address, created_at
+                FROM orders
+                WHERE user_id = :uid
+                ORDER BY created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['uid' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // public function getOrderItems(int $orderId): array {
+    //     $sql = "SELECT 
+    //                 op.product_id, op.quantity, op.price,
+    //                 p.name
+    //             FROM order_products op
+    //             INNER JOIN products p ON p.id = op.product_id
+    //             WHERE op.order_id = :oid
+    //             ORDER BY p.name ASC";
+    //     $stmt = $this->db->prepare($sql);
+    //     $stmt->execute(['oid' => $orderId]);
+    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // }
+
+
+    public function getOrderById(int $orderId, int $userId) {
+        $sql = "SELECT id, user_id, order_reference, status, payment_method, phone, address, created_at
+                FROM orders
+                WHERE id = :oid AND user_id = :uid
+                LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['oid' => $orderId, 'uid' => $userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getOrderItems(int $orderId): array {
+        $sql = "SELECT
+                op.product_id, op.quantity, op.price,
+                p.name,
+                c.name AS category_name,
+                t.name AS tax_name,
+                t.rate_iva AS tax_rate
+                FROM order_products op
+                INNER JOIN products p ON p.id = op.product_id
+                INNER JOIN categories c ON c.id = p.category_id
+                LEFT JOIN taxes t ON t.id = c.tax_id
+                WHERE op.order_id = :oid
+                ORDER BY p.name ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['oid' => $orderId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
     // -------------------------
     // Helpers

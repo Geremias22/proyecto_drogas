@@ -42,12 +42,14 @@ class AuthController {
             $valid = false;
 
             if ($user) {
-                // Si está hasheado (password_hash suele empezar por $2y$ o $argon2...)
-                if (isset($user['password']) && str_starts_with($user['password'], '$')) {
-                    $valid = password_verify($pass, $user['password']);
+                $stored = $user['password'] ?? '';
+
+                if ($stored !== '' && $stored[0] === '$') {
+                    // Hash moderno
+                    $valid = password_verify($pass, $stored);
                 } else {
-                    // Compatibilidad con contraseñas en claro (tu admin actual)
-                    $valid = ($user['password'] === $pass);
+                    // Password en claro (compatibilidad)
+                    $valid = ($stored === $pass);
                 }
             }
 
