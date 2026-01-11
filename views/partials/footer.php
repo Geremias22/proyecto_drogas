@@ -1,13 +1,13 @@
 <?php
   // Puedes definir esto en config.php si quieres.
   $appName = 'El Punto Ciego';
-  $appVersion = 'v1.1.0';
+  $appVersion = 'v1.1.1';
   $year = date('Y');
 
   // Edita nombres si quieres
   $creators = [
     'Geremias',
-    'Equipo DAM/DAW'
+    'David'
   ];
 ?>
 <footer class="pc-footer mt-5">
