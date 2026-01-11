@@ -1,4 +1,4 @@
-<h2 class="mb-4">🛒 Tu Carrito de Compra</h2>
+<h2 class="mb-4"><i class="fa-solid fa-cart-shopping"></i> Tu Carrito de Compra</h2>
 
 <?php if (empty($productsInCart)): ?>
     <div class="alert alert-info p-5 text-center">

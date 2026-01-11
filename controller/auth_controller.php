@@ -115,54 +115,68 @@ class AuthController
 
         $adult = (int)($_POST['adult_confirm'] ?? 0);
 
+        $_SESSION['old'] = [
+            'name' => $name,
+            'gmail' => $email,
+            'edad' => $edadRaw,
+            'adult_confirm' => $adult,
+            'security_question' => $question ?? '',
+            'security_answer' => $answer ?? '',
+        ];
         // 2) Obligatorios
         if ($name === '' || $email === '' || $pass === '') {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Rellena los campos obligatorios"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 
         // 3) Check + edad
         if ($adult !== 1) {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Debes confirmar que eres mayor de 18 años"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 
         if ($edad !== null) {
             if ($edad < 0 || $edad > 120) {
-                header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Edad no válida"));
+                $_SESSION['flash_error'] = "TU MENSAJE";
+                header("Location: index.php?c=auth&a=index&mode=register");
                 exit();
             }
-            // Si quieres endurecer (opcional):
-            // if ($edad < 18) { ... }
         }
 
         // 4) Validación nombre (simple y realista)
         if (mb_strlen($name) < 3 || mb_strlen($name) > 60) {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("El nombre debe tener entre 3 y 60 caracteres"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 
         // 5) Email formato
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Email no válido"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
         if (mb_strlen($email) > 255) {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Email demasiado largo"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 
         // 6) Password fuerte
         $pwdError = $this->validatePassword($pass);
         if ($pwdError !== null) {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode($pwdError));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 
         // 7) Comprobar email duplicado
         $userModel = new UserModel();
         if ($userModel->emailExists($email)) {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Ese email ya está registrado"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 
@@ -170,7 +184,8 @@ class AuthController
         $answer   = trim($_POST['security_answer'] ?? '');
 
         if ($question === '' || $answer === '') {
-            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Selecciona una pregunta y escribe una respuesta"));
+            $_SESSION['flash_error'] = "TU MENSAJE";
+            header("Location: index.php?c=auth&a=index&mode=register");
             exit();
         }
 

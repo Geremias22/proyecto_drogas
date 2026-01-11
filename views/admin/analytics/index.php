@@ -81,16 +81,16 @@
           <thead class="table-dark">
             <tr>
               <th>Producto</th>
-              <th class="text-end">Unidades</th>
-              <th class="text-end">Importe (sin IVA)</th>
+              <th class="text-center">Unidades</th>
+              <th class="text-center">Importe (sin IVA)</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($topProducts as $p): ?>
               <tr>
                 <td><?php echo htmlspecialchars($p['name']); ?></td>
-                <td class="text-end fw-bold"><?php echo (int)$p['units']; ?></td>
-                <td class="text-end"><?php echo number_format((float)$p['revenue'], 2, ',', '.'); ?>€</td>
+                <td class="text-center fw-bold"><?php echo (int)$p['units']; ?></td>
+                <td class="text-center"><?php echo number_format((float)$p['revenue'], 2, ',', '.'); ?>€</td>
               </tr>
             <?php endforeach; ?>
           </tbody>
@@ -102,6 +102,24 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  // Estilo global "dark" (textos blancos)
+  Chart.defaults.color = 'rgba(255,255,255,.88)'; // textos (títulos, ticks, legend)
+  Chart.defaults.borderColor = 'rgba(255,255,255,.12)'; // bordes/grid por defecto
+  Chart.defaults.font.family = "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+
+  // Tooltips y leyendas
+  Chart.defaults.plugins.legend.labels.color = 'rgba(255,255,255,.88)';
+  Chart.defaults.plugins.tooltip.titleColor = '#fff';
+  Chart.defaults.plugins.tooltip.bodyColor = 'rgba(255,255,255,.92)';
+  Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(2,6,23,.92)';
+  Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,.10)';
+  Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+  // Si quieres que el canvas no sea transparente, el fondo lo da la card.
+  // OJO: si tu card es oscura ya vale.
+</script>
+
 <script>
   // Datos PHP -> JS
   const byDayLabels = <?php echo json_encode(array_map(fn($r) => $r['day'], $byDay)); ?>;
@@ -119,8 +137,27 @@
         datasets: [{
           label: 'Ventas (€)',
           data: byDayValues,
-          tension: 0.25
+          tension: 0.25,
+          borderWidth: 2,
+          pointRadius: 2
         }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            labels: { color: 'rgba(255,255,255,.88)' }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: 'rgba(255,255,255,.75)' },
+            grid: { color: 'rgba(255,255,255,.08)' }
+          },
+          y: {
+            ticks: { color: 'rgba(255,255,255,.75)' },
+            grid: { color: 'rgba(255,255,255,.08)' }
+          }
+        }
       }
     });
   }
@@ -133,8 +170,17 @@
         labels: byCatLabels,
         datasets: [{
           label: '€',
-          data: byCatValues
+          data: byCatValues,
+          borderWidth: 1
         }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: 'rgba(255,255,255,.88)' }
+          }
+        }
       }
     });
   }

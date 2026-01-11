@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-9 mb-3">
         <h2 class="border-bottom pb-2">
-        🌿 Nuestro Catálogo
+        <i class="fa-solid fa-cannabis text-success"></i> Nuestro Catálogo
         <?php if (!empty($currentCategory)): ?>
             <span class="text-muted fs-5">— <?php echo htmlspecialchars($currentCategory['name']); ?></span>
         <?php endif; ?>
