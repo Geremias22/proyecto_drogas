@@ -35,10 +35,10 @@
                     <thead class="table-dark">
                         <tr>
                             <th>Producto</th>
-                            <th>Categoría</th>
+                            <th class="text-center">Categoría</th>
                             <th class="text-center">Qty</th>
-                            <th class="text-end">Precio</th>
-                            <th class="text-end">Subtotal</th>
+                            <th class="text-center">Precio</th>
+                            <th class="text-center">Subtotal</th>
                             <th class="text-center">Descuento</th>
                             <th class="text-center">Stock</th>
                         </tr>
@@ -59,7 +59,7 @@
                                         <?php echo htmlspecialchars(substr($it['description'] ?? '', 0, 70)); ?>...
                                     </small>
                                 </td>
-                                <td><?php echo htmlspecialchars($it['category_name']); ?></td>
+                                <td class="text-center"><?php echo htmlspecialchars($it['category_name']); ?></td>
                                 <td class="text-center"><?php echo $qty; ?></td>
                                 <td class="text-end"><?php echo number_format($price, 2); ?> €</td>
                                 <td class="text-end"><strong><?php echo number_format($subtotal, 2); ?> €</strong></td>

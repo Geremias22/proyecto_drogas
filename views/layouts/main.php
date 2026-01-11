@@ -7,6 +7,7 @@
     <!-- Bootstrap 5 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/proyecto_drogas/public/css/styles.css?v=2">
+    <link rel="icon" type="image/png" href="/proyecto_drogas/public/img/icon2.png">
 
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"

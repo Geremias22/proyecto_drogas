@@ -68,7 +68,7 @@
   </div>
 
   <div class="col-md-4 mb-3">
-    <a class="text-decoration-none" href="index.php?c=admin_stock&a=index">
+    <a class="text-decoration-none" href="index.php?c=stock&a=index">
       <div class="card shadow-sm h-100">
         <div class="card-body">
             <div class="d-flex align-items-center mb-2">
@@ -96,6 +96,6 @@
   </div>
 </div>
 
-<div class="alert alert-warning mt-4">
+<!-- <div class="alert alert-warning mt-4">
   <strong>Nota:</strong> Algunos accesos todavía pueden estar “en construcción”. Iremos implementándolos uno por uno.
-</div>
+</div> -->

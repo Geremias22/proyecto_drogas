@@ -11,7 +11,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.php?c=product_list">Catálogo</a></li>
-                        <li class="breadcrumb-item active"><?php echo $product['category_name']; ?></li>
+                        <li class="breadcrumb-item active" style="color: white;"><?php echo $product['category_name']; ?></li>
                     </ol>
                 </nav>
 
