@@ -10,6 +10,9 @@
     </div>
 
     <button type="submit" class="btn btn-primary w-100">Entrar</button>
+    <div class="text-center mt-3">
+        <a href="index.php?c=auth&a=forgot">¿Has olvidado la contraseña?</a>
+    </div>
 
     <?php if(isset($_GET['error'])): ?>
         <div class="alert alert-danger mt-3 mb-0">
