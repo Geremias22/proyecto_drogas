@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="mb-0">📦 Packs</h2>
-  <a class="btn btn-success" href="index.php?c=admin_pack&a=create">+ Nuevo pack</a>
+  <a class="btn btn-success" href="index.php?c=admin_pack&a=create"><i class="fa-solid fa-plus me-2"></i>Nuevo pack</a>
 </div>
 
 <div class="card shadow-sm">
@@ -29,12 +29,12 @@
               </a>
               <a class="btn btn-sm btn-outline-primary"
                  href="index.php?c=admin_pack&a=edit&id=<?php echo (int)$p['id']; ?>">
-                Editar
+                <i class="fa-solid fa-pen-to-square me-2"></i>Editar
               </a>
               <form class="d-inline" method="POST" action="index.php?c=admin_pack&a=delete"
                     onsubmit="return confirm('¿Eliminar pack?');">
                 <input type="hidden" name="id" value="<?php echo (int)$p['id']; ?>">
-                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash-can me-2"></i>Eliminar</button>
               </form>
             </td>
           </tr>

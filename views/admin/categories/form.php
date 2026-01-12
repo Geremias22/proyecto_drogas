@@ -5,7 +5,7 @@ $action = $isEdit ? 'update' : 'store';
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="mb-0"><?php echo $isEdit ? '✏️ Editar categoría' : '➕ Nueva categoría'; ?></h2>
-  <a class="btn btn-outline-secondary" href="index.php?c=admin_category&a=index">Volver</a>
+  <a class="btn btn-outline-secondary" href="index.php?c=admin_category&a=index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
 </div>
 
 <div class="card shadow-sm">
@@ -55,7 +55,11 @@ $action = $isEdit ? 'update' : 'store';
                value="<?php echo htmlspecialchars($category['image'] ?? ''); ?>">
       </div>
 
-      <button class="btn btn-success"><?php echo $isEdit ? 'Guardar cambios' : 'Crear categoría'; ?></button>
+      <?php if ($isEdit): ?>
+        <button class="btn btn-success"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar cambios</button>
+      <?php else: ?>
+        <button class="btn btn-success"><i class="fa-solid fa-plus me-2"></i>Crear categoría</button>
+      <?php endif; ?>
     </form>
   </div>
 </div>

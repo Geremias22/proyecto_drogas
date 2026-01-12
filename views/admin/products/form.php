@@ -5,7 +5,7 @@ $action = $isEdit ? 'update' : 'store';
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="mb-0"><?php echo $isEdit ? '✏️ Editar producto' : '➕ Nuevo producto'; ?></h2>
-  <a class="btn btn-outline-secondary" href="index.php?c=admin_product&a=index">Volver</a>
+  <a class="btn btn-outline-secondary" href="index.php?c=admin_product&a=index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
 </div>
 
 <div class="card shadow-sm">
@@ -66,7 +66,11 @@ $action = $isEdit ? 'update' : 'store';
         <label class="form-check-label" for="is_active">Producto activo</label>
       </div>
 
-      <button class="btn btn-success"><?php echo $isEdit ? 'Guardar cambios' : 'Crear producto'; ?></button>
+      <?php if ($isEdit): ?>
+        <button class="btn btn-success"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar cambios</button>
+      <?php else: ?>
+        <button class="btn btn-success"><i class="fa-solid fa-plus me-2"></i>Crear producto</button>
+      <?php endif; ?>
     </form>
   </div>
 </div>

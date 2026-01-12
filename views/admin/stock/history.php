@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  <a class="btn btn-outline-secondary" href="index.php?c=stock&a=index">Volver</a>
+  <a class="btn btn-outline-secondary" href="index.php?c=stock&a=index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
 </div>
 
 <div class="card shadow-sm">
