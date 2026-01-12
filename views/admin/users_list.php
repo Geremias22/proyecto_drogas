@@ -38,7 +38,7 @@
                     <option value="customer" <?php echo ($u['role']==='customer')?'selected':''; ?>>customer</option>
                     <option value="admin" <?php echo ($u['role']==='admin')?'selected':''; ?>>admin</option>
                   </select>
-                  <button class="btn btn-sm btn-outline-primary">Guardar</button>
+                  <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar</button>
                 </form>
 
                 <!-- Activar/Desactivar -->

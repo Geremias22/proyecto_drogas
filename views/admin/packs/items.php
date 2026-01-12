@@ -15,8 +15,8 @@ $mode = $final['mode'];
   </div>
 
   <div>
-    <a class="btn btn-outline-secondary" href="index.php?c=admin_pack&a=index">Volver</a>
-    <a class="btn btn-outline-primary" href="index.php?c=admin_pack&a=edit&id=<?php echo (int)$pack['id']; ?>">Editar pack</a>
+    <a class="btn btn-outline-secondary" href="index.php?c=admin_pack&a=index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    <a class="btn btn-outline-primary" href="index.php?c=admin_pack&a=edit&id=<?php echo (int)$pack['id']; ?>"><i class="fa-solid fa-pen-to-square me-2"></i>Editar pack</a>
   </div>
 </div>
 
@@ -101,7 +101,7 @@ $mode = $final['mode'];
             <input type="number" name="qty" min="1" value="1" class="form-control" required>
           </div>
 
-          <button class="btn btn-success w-100">Añadir / Actualizar</button>
+          <button class="btn btn-success w-100"><i class="fa-solid fa-plus me-2"></i>Añadir / Actualizar</button>
         </form>
 
         <div class="alert alert-secondary mt-3 mb-0">

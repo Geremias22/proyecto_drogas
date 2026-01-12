@@ -5,7 +5,7 @@ $action = $isEdit ? 'update' : 'store';
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0"><?php echo $isEdit ? '✏️ Editar pack' : '➕ Nuevo pack'; ?></h2>
-    <a class="btn btn-outline-secondary" href="index.php?c=admin_pack&a=index">Volver</a>
+    <a class="btn btn-outline-secondary" href="index.php?c=admin_pack&a=index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
 </div>
 
 <div class="card shadow-sm">
@@ -56,7 +56,7 @@ $action = $isEdit ? 'update' : 'store';
                     </div>
                     <a class="btn btn-sm btn-outline-success"
                         href="index.php?c=admin_pack&a=items&id=<?php echo $packId; ?>">
-                        Editar contenido
+                        <i class="fa-solid fa-pen-to-square me-2"></i>Editar contenido
                     </a>
                 </div>
             <?php else: ?>
@@ -88,12 +88,16 @@ $action = $isEdit ? 'update' : 'store';
                 </div>
             </div>
 
-            <button class="btn btn-success"><?php echo $isEdit ? 'Guardar' : 'Crear'; ?></button>
+            <?php if ($isEdit): ?>
+                <button class="btn btn-success"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar</button>
+            <?php else: ?>
+                <button class="btn btn-success"><i class="fa-solid fa-plus me-2"></i>Crear</button>
+            <?php endif; ?>
 
             <?php if ($isEdit): ?>
                 <a class="btn btn-outline-success ms-2"
                     href="index.php?c=admin_pack&a=items&id=<?php echo (int)$pack['id']; ?>">
-                    Editar contenido
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Editar contenido
                 </a>
             <?php endif; ?>
         </form>

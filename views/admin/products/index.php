@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="mb-0">📦 Productos</h2>
-  <a class="btn btn-success" href="index.php?c=admin_product&a=create">+ Nuevo producto</a>
+  <a class="btn btn-success" href="index.php?c=admin_product&a=create"><i class="fa-solid fa-plus me-2"></i>Nuevo producto</a>
 </div>
 
 <div class="card shadow-sm">
@@ -34,13 +34,13 @@
             </td>
             <td class="text-end">
               <a class="btn btn-sm btn-outline-primary" href="index.php?c=admin_product&a=edit&id=<?php echo (int)$p['id']; ?>">
-                Editar
+                <i class="fa-solid fa-pen-to-square me-2"></i>Editar
               </a>
 
               <form class="d-inline" method="POST" action="index.php?c=admin_product&a=delete"
                     onsubmit="return confirm('¿Desactivar este producto?');">
                 <input type="hidden" name="id" value="<?php echo (int)$p['id']; ?>">
-                <button class="btn btn-sm btn-outline-danger">Desactivar</button>
+                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash-can me-2"></i>Desactivar</button>
               </form>
             </td>
           </tr>
