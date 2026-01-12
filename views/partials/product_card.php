@@ -19,7 +19,8 @@
                 </button>
             <?php else: ?>
                 <a href="index.php?c=cart&a=add&id=<?php echo (int)$product['id']; ?>"
-                class="btn btn-success w-100">
+                    class="btn btn-success w-100 js-add-to-cart"
+                    data-product-id="<?php echo (int)$product['id']; ?>">
                     Añadir al carrito
                 </a>
             <?php endif; ?>

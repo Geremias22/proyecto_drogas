@@ -279,3 +279,6 @@ INSERT INTO users (name, role, gmail, password, edad, is_active) VALUES
 -- ALTER TABLE users
 --   ADD COLUMN security_question VARCHAR(255) NULL AFTER password,
 --   ADD COLUMN security_answer_hash VARCHAR(255) NULL AFTER security_question;
+
+
+-- pendiente ajax catalogo

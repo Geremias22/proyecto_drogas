@@ -1,7 +1,7 @@
 <?php
   // Puedes definir esto en config.php si quieres.
   $appName = 'El Punto Ciego';
-  $appVersion = 'v1.1.1';
+  $appVersion = 'v1.1.2';
   $year = date('Y');
 
   // Edita nombres si quieres

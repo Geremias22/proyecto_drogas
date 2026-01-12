@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +11,19 @@
     <link rel="icon" type="image/png" href="/proyecto_drogas/public/img/icon2.png">
 
     <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer">
 
 
 
 </head>
+
 <body class="bg-light">
     <?php include 'views/partials/navbar.php'; ?>
 
     <div class="container mt-4">
-        
+
         <?php
         // Construimos un "toast" desde msg/error/flash
         $toast = null;
@@ -38,21 +40,21 @@
         ?>
 
         <?php if ($toast): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
-            <div id="appToast"
-                class="toast align-items-center text-bg-<?php echo htmlspecialchars($toast['type']); ?> border-0"
-                role="alert" aria-live="assertive" aria-atomic="true"
-                data-bs-delay="2500">
-            <div class="d-flex">
-                <div class="toast-body">
-                <strong class="me-2"><?php echo htmlspecialchars($toast['title']); ?>:</strong>
-                <?php echo htmlspecialchars($toast['text']); ?>
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+                <div id="appToast"
+                    class="toast align-items-center text-bg-<?php echo htmlspecialchars($toast['type']); ?> border-0"
+                    role="alert" aria-live="assertive" aria-atomic="true"
+                    data-bs-delay="2500">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <strong class="me-2"><?php echo htmlspecialchars($toast['title']); ?>:</strong>
+                            <?php echo htmlspecialchars($toast['text']); ?>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            </div>
-        </div>
         <?php endif; ?>
 
 
@@ -69,15 +71,73 @@
     <!-- JS de Bootstrap (necesario para cerrar las alertas y el menú) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const el = document.getElementById('appToast');
-        if (el && window.bootstrap) {
-        const toast = new bootstrap.Toast(el);
-        toast.show();
-        }
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            const el = document.getElementById('appToast');
+            if (el && window.bootstrap) {
+                const toast = new bootstrap.Toast(el);
+                toast.show();
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.js-add-to-cart');
+            if (!btn) return;
+
+            e.preventDefault();
+
+            const id = btn.dataset.productId;
+            const url = btn.getAttribute('href'); // mantiene tu routing actual
+
+            // UI: bloquear mientras añade
+            const oldText = btn.textContent;
+            btn.classList.add('disabled');
+            btn.setAttribute('aria-disabled', 'true');
+            btn.textContent = 'Añadiendo...';
+
+            try {
+                const formData = new FormData();
+                formData.append('quantity', '1');
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (!res.ok || !data.ok) {
+                    alert(data.message || 'Error al añadir al carrito');
+                    return;
+                }
+
+                // 1) Actualizar badge contador (si tienes uno)
+                const badge = document.querySelector('[data-cart-count]');
+                if (badge) badge.textContent = data.cart_count;
+
+                // 2) Feedback rápido
+                btn.textContent = 'Añadido ✓';
+                setTimeout(() => {
+                    btn.textContent = oldText;
+                    btn.classList.remove('disabled');
+                    btn.removeAttribute('aria-disabled');
+                }, 800);
+
+            } catch (err) {
+                console.error(err);
+                alert('Error de red. Intenta de nuevo.');
+                btn.textContent = oldText;
+                btn.classList.remove('disabled');
+                btn.removeAttribute('aria-disabled');
+            }
+        });
     </script>
 
     <script src="public/js/catalog.js"></script>
 </body>
+
 </html>
