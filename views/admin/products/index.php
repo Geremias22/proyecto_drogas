@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="mb-0">📦 Productos</h2>
+  <h2 class="mb-0" style="color: mediumseagreen;"><i class="fa-solid fa-box me-2"></i>Productos</h2>
   <a class="btn btn-success" href="index.php?c=admin_product&a=create"><i class="fa-solid fa-plus me-2"></i>Nuevo producto</a>
 </div>
 

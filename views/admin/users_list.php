@@ -1,4 +1,4 @@
-<h2 class="mb-4">👥 Gestión de usuarios</h2>
+<h2 class="mb-4" style="color: mediumseagreen;"><i class="fa-solid fa-users me-2"></i> Gestión de usuarios</h2>
 
 <div class="card shadow-sm">
   <div class="card-body p-0">
