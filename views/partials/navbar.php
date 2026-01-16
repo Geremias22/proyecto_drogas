@@ -82,7 +82,7 @@
           <li class="nav-item">
             <a class="nav-link btn btn-success btn-sm text-white ms-lg-2 px-3" href="index.php?c=cart&a=index">
               <i class="fa-solid fa-cart-shopping"></i> Carrito
-              <span class="badge bg-danger ms-1">
+              <span class="badge bg-danger ms-1" data-cart-count>
                 <?php echo isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0; ?>
               </span>
             </a>
