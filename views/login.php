@@ -1,4 +1,6 @@
 <form action="index.php?c=auth&a=login" method="POST" class="card p-4 shadow">
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SecurityHelper::generateCsrfToken()); ?>">
+    
     <div class="mb-3">
         <label>Email (Gmail)</label>
         <input type="email" name="gmail" class="form-control" required>

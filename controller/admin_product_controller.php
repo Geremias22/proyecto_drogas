@@ -2,7 +2,8 @@
 require_once 'controller/auth_controller.php';
 require_once 'model/ProductModel.php';
 require_once 'model/CategoryModel.php';
-require_once 'model/SupplierModel.php'; // si no existe, abajo te doy versión mínima
+require_once 'model/SupplierModel.php';
+require_once 'helpers/SecurityHelper.php';
 
 class AdminProductController
 {
@@ -47,7 +48,21 @@ class AdminProductController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_product&a=create&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $data = $this->readProductPost();
+        
+        // Validación server-side
+        $error = $this->validateProduct($data);
+        if ($error) {
+            header("Location: index.php?c=admin_product&a=create&error=" . urlencode($error));
+            exit();
+        }
 
         $productModel = new ProductModel();
         $ok = $productModel->createAdmin($data);
@@ -101,6 +116,13 @@ class AdminProductController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_product&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             header("Location: index.php?c=admin_product&a=index&error=ID inválido");
@@ -108,6 +130,13 @@ class AdminProductController
         }
 
         $data = $this->readProductPost();
+        
+        // Validación server-side
+        $error = $this->validateProduct($data);
+        if ($error) {
+            header("Location: index.php?c=admin_product&a=edit&id=$id&error=" . urlencode($error));
+            exit();
+        }
 
         $productModel = new ProductModel();
         $ok = $productModel->updateAdmin($id, $data);
@@ -126,6 +155,13 @@ class AdminProductController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: index.php?c=admin_product&a=index");
+            exit();
+        }
+
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_product&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
             exit();
         }
 
@@ -164,5 +200,45 @@ class AdminProductController
             'price' => $price,
             'is_active' => $isActive,
         ];
+    }
+
+    /**
+     * Valida los datos del producto antes de guardar
+     * Retorna null si es válido, o un mensaje de error si no
+     */
+    private function validateProduct(array $data): ?string
+    {
+        // Validar nombre
+        if (empty($data['name'])) {
+            return "El nombre es obligatorio";
+        }
+        if (mb_strlen($data['name']) < 3 || mb_strlen($data['name']) > 100) {
+            return "El nombre debe tener entre 3 y 100 caracteres";
+        }
+
+        // Validar descripción (opcional pero si existe, validar)
+        if (!empty($data['description']) && mb_strlen($data['description']) > 1000) {
+            return "La descripción no puede exceder 1000 caracteres";
+        }
+
+        // Validar precio
+        if ($data['price'] < 0) {
+            return "El precio no puede ser negativo";
+        }
+        if ($data['price'] > 999999.99) {
+            return "El precio es demasiado alto";
+        }
+
+        // Validar categoría (obligatoria)
+        if ($data['category_id'] <= 0) {
+            return "Debes seleccionar una categoría";
+        }
+
+        // Validar is_active
+        if ($data['is_active'] !== 0 && $data['is_active'] !== 1) {
+            return "Estado del producto inválido";
+        }
+
+        return null; // Todo válido
     }
 }

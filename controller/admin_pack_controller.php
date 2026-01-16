@@ -3,6 +3,7 @@ require_once 'controller/auth_controller.php';
 require_once 'model/PackModel.php';
 require_once 'model/PackProductModel.php';
 require_once 'model/ProductModel.php';
+require_once 'helpers/SecurityHelper.php';
 
 class AdminPackController
 {
@@ -44,10 +45,19 @@ class AdminPackController
             exit();
         }
 
-        $data = $this->readPackPost();
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_pack&a=create&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
 
-        if ($data['name'] === '') {
-            header("Location: index.php?c=admin_pack&a=create&error=El nombre es obligatorio");
+        $data = $this->readPackPost();
+        
+        // Validación server-side
+        $error = $this->validatePack($data);
+        if ($error) {
+            header("Location: index.php?c=admin_pack&a=create&error=" . urlencode($error));
             exit();
         }
 
@@ -98,6 +108,13 @@ class AdminPackController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_pack&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             header("Location: index.php?c=admin_pack&a=index&error=ID inválido");
@@ -105,9 +122,11 @@ class AdminPackController
         }
 
         $data = $this->readPackPost();
-
-        if ($data['name'] === '') {
-            header("Location: index.php?c=admin_pack&a=edit&id=$id&error=El nombre es obligatorio");
+        
+        // Validación server-side
+        $error = $this->validatePack($data);
+        if ($error) {
+            header("Location: index.php?c=admin_pack&a=edit&id=$id&error=" . urlencode($error));
             exit();
         }
 
@@ -128,6 +147,13 @@ class AdminPackController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: index.php?c=admin_pack&a=index");
+            exit();
+        }
+
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_pack&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
             exit();
         }
 
@@ -201,6 +227,13 @@ class AdminPackController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_pack&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $packId = (int)($_POST['pack_id'] ?? 0);
         $productId = (int)($_POST['product_id'] ?? 0);
         $qty = (int)($_POST['qty'] ?? 1);
@@ -235,6 +268,13 @@ class AdminPackController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: index.php?c=admin_pack&a=index");
+            exit();
+        }
+
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_pack&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
             exit();
         }
 
@@ -327,6 +367,54 @@ class AdminPackController
             'final_price' => $finalPrice,
             'discount_percent' => $discount,
         ];
+    }
+
+    /**
+     * Valida los datos del pack antes de guardar
+     * Retorna null si es válido, o un mensaje de error si no
+     */
+    private function validatePack(array $data): ?string
+    {
+        // Validar nombre
+        if (empty($data['name'])) {
+            return "El nombre del pack es obligatorio";
+        }
+        if (mb_strlen($data['name']) < 2 || mb_strlen($data['name']) > 100) {
+            return "El nombre debe tener entre 2 y 100 caracteres";
+        }
+
+        // Validar imagen (opcional)
+        if ($data['image'] !== null) {
+            if (mb_strlen($data['image']) > 255) {
+                return "La URL de imagen es demasiado larga";
+            }
+            if (strpos($data['image'], 'http') === 0) {
+                if (!filter_var($data['image'], FILTER_VALIDATE_URL)) {
+                    return "La URL de imagen no es válida";
+                }
+            }
+        }
+
+        // Validar parent_id si existe
+        if ($data['parent_id'] !== null && $data['parent_id'] <= 0) {
+            return "ID de pack padre inválido";
+        }
+
+        // Validar final_price
+        if ($data['final_price'] !== null) {
+            if ($data['final_price'] < 0 || $data['final_price'] > 999999.99) {
+                return "Precio del pack inválido";
+            }
+        }
+
+        // Validar discount_percent
+        if ($data['discount_percent'] !== null) {
+            if ($data['discount_percent'] < 0 || $data['discount_percent'] > 100) {
+                return "El descuento debe estar entre 0 y 100%";
+            }
+        }
+
+        return null; // Todo válido
     }
 
     private function calcPackFinal(float $sum, array $pack): array

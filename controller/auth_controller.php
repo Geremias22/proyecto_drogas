@@ -1,5 +1,6 @@
 <?php
 require_once 'model/UserModel.php';
+require_once 'helpers/SecurityHelper.php';
 
 class AuthController
 {
@@ -38,11 +39,31 @@ class AuthController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // 1) Validar CSRF token
+            $csrf_token = trim($_POST['csrf_token'] ?? '');
+            if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+                header("Location: index.php?c=auth&a=index&mode=login&error=" . urlencode("Solicitud inválida (CSRF)"));
+                exit();
+            }
+
             $email = trim($_POST['gmail'] ?? '');
             $pass  = (string)($_POST['password'] ?? '');
 
             if ($email === '' || $pass === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 header("Location: index.php?c=auth&a=index&mode=login&error=" . urlencode("Credenciales inválidas"));
+                exit();
+            }
+
+            // 2) Rate limiting: máx 5 intentos en 15 minutos por email
+            $rateLimitKey = 'login_attempt_' . strtolower($email);
+            $maxAttempts = 5;
+            $windowSeconds = 900; // 15 minutos
+
+            $allowed = SecurityHelper::recordFailedAttempt($rateLimitKey, $maxAttempts, $windowSeconds);
+            if (!$allowed) {
+                $remaining = SecurityHelper::getTimeUntilReset($rateLimitKey, $windowSeconds);
+                $minutes = ceil($remaining / 60);
+                header("Location: index.php?c=auth&a=index&mode=login&error=" . urlencode("Demasiados intentos. Intenta en $minutes minutos"));
                 exit();
             }
 
@@ -69,6 +90,9 @@ class AuthController
             }
 
             if ($valid) {
+                // Login exitoso: limpiar rate limit
+                SecurityHelper::clearRateLimit($rateLimitKey);
+
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_role'] = $user['role'];
@@ -79,8 +103,9 @@ class AuthController
                     header("Location: index.php?c=home&a=index&msg=Bienvenido a la asociación");
                 }
             } else {
-                header("Location: index.php?c=auth&a=index&error=Email o contraseña incorrectos");
+                header("Location: index.php?c=auth&a=index&mode=login&error=" . urlencode("Email o contraseña incorrectos"));
             }
+            exit();
         }
     }
 
@@ -105,7 +130,14 @@ class AuthController
             exit();
         }
 
-        // 1) Normalización
+        // 1) Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=auth&a=index&mode=register&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
+        // 2) Normalización
         $name  = trim($_POST['name'] ?? '');
         $email = trim($_POST['gmail'] ?? '');
         $pass  = (string)($_POST['password'] ?? '');
@@ -265,7 +297,26 @@ class AuthController
             exit();
         }
 
+        // 1) Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=auth&a=forgot&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $email = trim($_POST['gmail'] ?? '');
+
+        // 2) Rate limiting: máx 5 intentos en 15 minutos por email
+        $rateLimitKey = 'forgot_attempt_' . strtolower($email);
+        $maxAttempts = 5;
+        $windowSeconds = 900; // 15 minutos
+
+        $allowed = SecurityHelper::recordFailedAttempt($rateLimitKey, $maxAttempts, $windowSeconds);
+        if (!$allowed) {
+            // Mensaje genérico para no filtrar si existe
+            header("Location: index.php?c=auth&a=forgot&msg=" . urlencode("Si el email existe, podrás continuar con la recuperación."));
+            exit();
+        }
 
         // Mensaje siempre "neutral" para no filtrar si existe
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -323,6 +374,13 @@ class AuthController
             exit();
         }
 
+        // 1) Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=auth&a=forgot&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $uid = (int)($_POST['uid'] ?? 0);
         $answer = trim($_POST['security_answer'] ?? '');
         $newPass = (string)($_POST['new_password'] ?? '');
@@ -330,6 +388,19 @@ class AuthController
         
         if ($uid <= 0 || $answer === '' || $newPass === '') {
             header("Location: index.php?c=auth&a=reset&uid=$uid&error=" . urlencode("Rellena todos los campos"));
+            exit();
+        }
+
+        // 2) Rate limiting: máx 5 intentos en 15 minutos por user ID
+        $rateLimitKey = 'reset_attempt_' . $uid;
+        $maxAttempts = 5;
+        $windowSeconds = 900; // 15 minutos
+
+        $allowed = SecurityHelper::recordFailedAttempt($rateLimitKey, $maxAttempts, $windowSeconds);
+        if (!$allowed) {
+            $remaining = SecurityHelper::getTimeUntilReset($rateLimitKey, $windowSeconds);
+            $minutes = ceil($remaining / 60);
+            header("Location: index.php?c=auth&a=reset&uid=$uid&error=" . urlencode("Demasiados intentos. Intenta en $minutes minutos"));
             exit();
         }
 
@@ -352,6 +423,9 @@ class AuthController
             header("Location: index.php?c=auth&a=reset&uid=$uid&error=" . urlencode("Respuesta incorrecta"));
             exit();
         }
+
+        // Reset exitoso: limpiar rate limit
+        SecurityHelper::clearRateLimit($rateLimitKey);
 
         $hash = password_hash($newPass, PASSWORD_DEFAULT);
         $userModel->updatePasswordHash($uid, $hash);

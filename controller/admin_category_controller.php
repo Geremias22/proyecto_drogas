@@ -2,6 +2,7 @@
 require_once 'controller/auth_controller.php';
 require_once 'model/CategoryModel.php';
 require_once 'model/TaxModel.php';
+require_once 'helpers/SecurityHelper.php';
 
 class AdminCategoryController
 {
@@ -46,7 +47,21 @@ class AdminCategoryController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_category&a=create&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $data = $this->readPost();
+        
+        // Validación server-side
+        $error = $this->validateCategory($data);
+        if ($error) {
+            header("Location: index.php?c=admin_category&a=create&error=" . urlencode($error));
+            exit();
+        }
 
         $categoryModel = new CategoryModel();
         $ok = $categoryModel->createAdmin($data);
@@ -97,6 +112,13 @@ class AdminCategoryController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_category&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             header("Location: index.php?c=admin_category&a=index&error=ID inválido");
@@ -104,6 +126,13 @@ class AdminCategoryController
         }
 
         $data = $this->readPost();
+        
+        // Validación server-side
+        $error = $this->validateCategory($data);
+        if ($error) {
+            header("Location: index.php?c=admin_category&a=edit&id=$id&error=" . urlencode($error));
+            exit();
+        }
 
         $categoryModel = new CategoryModel();
         $ok = $categoryModel->updateAdmin($id, $data);
@@ -122,6 +151,13 @@ class AdminCategoryController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: index.php?c=admin_category&a=index");
+            exit();
+        }
+
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=admin_category&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
             exit();
         }
 
@@ -156,5 +192,45 @@ class AdminCategoryController
             'parent_id' => $parentId,
             'tax_id' => $taxId,
         ];
+    }
+
+    /**
+     * Valida los datos de la categoría antes de guardar
+     * Retorna null si es válido, o un mensaje de error si no
+     */
+    private function validateCategory(array $data): ?string
+    {
+        // Validar nombre
+        if (empty($data['name'])) {
+            return "El nombre es obligatorio";
+        }
+        if (mb_strlen($data['name']) < 2 || mb_strlen($data['name']) > 100) {
+            return "El nombre debe tener entre 2 y 100 caracteres";
+        }
+
+        // Validar imagen (opcional, pero si existe validar formato URL)
+        if ($data['image'] !== null) {
+            if (mb_strlen($data['image']) > 255) {
+                return "La URL de imagen es demasiado larga";
+            }
+            // Validar que sea una URL válida (solo si no es ruta local)
+            if (strpos($data['image'], 'http') === 0) {
+                if (!filter_var($data['image'], FILTER_VALIDATE_URL)) {
+                    return "La URL de imagen no es válida";
+                }
+            }
+        }
+
+        // Validar parent_id si existe
+        if ($data['parent_id'] !== null && $data['parent_id'] <= 0) {
+            return "ID de categoría padre inválido";
+        }
+
+        // Validar tax_id si existe
+        if ($data['tax_id'] !== null && $data['tax_id'] <= 0) {
+            return "ID de impuesto inválido";
+        }
+
+        return null; // Todo válido
     }
 }

@@ -16,7 +16,8 @@ function old($key, $default = '')
     class="card p-4 shadow needs-validation"
     novalidate>
 
-    <div class="mb-3">
+     <div class="mb-3">
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SecurityHelper::generateCsrfToken()); ?>">
         <label class="form-label">Nombre</label>
         <input type="text"
             name="name"

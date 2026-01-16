@@ -2,6 +2,7 @@
 require_once 'controller/auth_controller.php';
 require_once 'model/UserModel.php';
 require_once 'model/OrderModel.php';
+require_once 'helpers/SecurityHelper.php';
 
 class UserController
 {
@@ -29,6 +30,13 @@ class UserController
             exit();
         }
 
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=user&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
+            exit();
+        }
+
         $id = (int)($_POST['id'] ?? 0);
         $role = $_POST['role'] ?? 'customer';
 
@@ -50,6 +58,13 @@ class UserController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: index.php?c=user&a=index");
+            exit();
+        }
+
+        // Validar CSRF token
+        $csrf_token = trim($_POST['csrf_token'] ?? '');
+        if (!SecurityHelper::validateCsrfToken($csrf_token)) {
+            header("Location: index.php?c=user&a=index&error=" . urlencode("Solicitud inválida (CSRF)"));
             exit();
         }
 

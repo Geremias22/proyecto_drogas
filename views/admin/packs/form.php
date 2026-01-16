@@ -11,9 +11,7 @@ $action = $isEdit ? 'update' : 'store';
 <div class="card shadow-sm">
     <div class="card-body">
         <form method="POST" action="index.php?c=admin_pack&a=<?php echo $action; ?>">
-            <?php if ($isEdit): ?>
-                <input type="hidden" name="id" value="<?php echo (int)$pack['id']; ?>">
-            <?php endif; ?>
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SecurityHelper::generateCsrfToken()); ?>">
 
             <div class="mb-3">
                 <label class="form-label">Nombre</label>

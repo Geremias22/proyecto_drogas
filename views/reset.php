@@ -3,6 +3,7 @@
         <h2 class="text-center mb-3">Restablecer contraseña</h2>
 
         <form action="index.php?c=auth&a=resetPost" method="POST" class="card p-4 shadow needs-validation" novalidate>
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SecurityHelper::generateCsrfToken()); ?>">
             <input type="hidden" name="uid" value="<?php echo (int)$uid; ?>">
 
             <div class="mb-3">

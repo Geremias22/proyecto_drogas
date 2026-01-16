@@ -2,6 +2,10 @@
 session_start();
 
 require_once 'model/conectaDB.php';
+require_once 'helpers/SecurityHelper.php';
+
+// Generar CSRF token si no existe
+SecurityHelper::generateCsrfToken();
 
 $controllerName = $_GET['c'] ?? 'home'; // Controlador por defecto
 $action = $_GET['a'] ?? 'index';        // Acción por defecto
